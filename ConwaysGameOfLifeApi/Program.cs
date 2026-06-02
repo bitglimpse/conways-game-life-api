@@ -15,10 +15,18 @@ builder.Services.Configure<GameConfiguration>(
     builder.Configuration.GetSection(GameConfiguration.SectionName));
 
 // Add database context
+var databaseProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "InMemory";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
+    if (databaseProvider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase))
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseInMemoryDatabase("ConwaysGameOfLife");
+    }
 });
 
 // Add controllers
