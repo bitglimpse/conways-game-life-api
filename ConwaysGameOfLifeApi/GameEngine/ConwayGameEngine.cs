@@ -1,5 +1,17 @@
 namespace ConwaysGameOfLifeApi.GameEngine;
 
+/// <summary>
+/// Conway's Game of Life engine using dense 2D array representation.
+/// 
+/// NOTE: This implementation uses a dense array approach which is optimal for boards
+/// where most cells need to be checked (typical for small-to-medium grids up to ~1000x1000).
+/// For very large sparse boards (e.g., 100k x 100k with <1% density), a HashSet-based
+/// sparse representation would be more memory efficient, storing only live cell coordinates
+/// (HashSet&lt;(int row, int col)&gt;) and checking only those cells plus their neighbors.
+/// However, the API constraint of accepting full 2D grid JSON uploads makes extremely 
+/// large boards impractical regardless of the internal representation, as a 100k x 100k 
+/// board would require ~50-100GB JSON payload to upload.
+/// </summary>
 public class ConwayGameEngine
 {
   /// <summary>
