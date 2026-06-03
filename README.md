@@ -1,6 +1,6 @@
 # Conway's Game of Life RESTful API
 
-A production-ready REST API implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) built with .NET 8 and PostgreSQL.
+A production-ready REST API implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) built with .NET 8.
 
 ## Overview
 
@@ -10,22 +10,24 @@ This API allows you to:
 - Calculate N generations ahead
 - Find final stable states (static or oscillating patterns)
 
-The service persists board states to PostgreSQL, ensuring data survives application restarts.
+The service persists board states using a configurable database (in-memory by default, PostgreSQL for production).
 
 ## Tech Stack
 
 - **.NET 8.0** - Modern cross-platform framework
 - **ASP.NET Core** - Web API framework
 - **Entity Framework Core** - ORM for database access
-- **PostgreSQL** - Relational database with JSONB support
+- **Database** - Configurable: InMemory (default) or PostgreSQL
 - **FluentValidation** - Input validation
 - **xUnit** - Testing framework
 - **Moq** - Mocking framework for unit tests
 
+> **Note:** The API defaults to an **in-memory database** for easy setup with no dependencies. To use PostgreSQL for production persistence, change `"DatabaseProvider": "PostgreSQL"` in `appsettings.json` and follow the database setup steps below.
+
 ## Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [PostgreSQL 12+](https://www.postgresql.org/download/)
+- (Optional for PostgreSQL) [PostgreSQL 12+](https://www.postgresql.org/download/)
 - (Optional) [pgAdmin](https://www.pgadmin.org/) for database management
 
 ## Quick Start
@@ -36,42 +38,54 @@ The service persists board states to PostgreSQL, ensuring data survives applicat
 cd ~/code/demos/conways-game-life
 ```
 
-### 2. Setup Database
+### 2. Run the Application
 
-Create a PostgreSQL database:
-
-```sql
-CREATE DATABASE conways_game_of_life;
+```bash
+cd ConwaysGameOfLifeApi
+dotnet run
 ```
 
-Update the connection string in `ConwaysGameOfLifeApi/appsettings.json` if needed:
+The API will start (default: `http://localhost:5282`) using an in-memory database.
+
+### 3. Test the API
+
+Use curl, Postman, or any HTTP client to test the endpoints. See [EXAMPLES.md](EXAMPLES.md) for sample requests.
+
+---
+
+### Optional: Using PostgreSQL
+
+To use PostgreSQL instead of the in-memory database:
+
+**1. Update configuration** in `ConwaysGameOfLifeApi/appsettings.json`:
 
 ```json
 {
+  "DatabaseProvider": "PostgreSQL",
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=conways_game_of_life;Username=postgres;Password=postgres"
   }
 }
 ```
 
-### 3. Run Migrations
+**2. Create database:**
+
+```sql
+CREATE DATABASE conways_game_of_life;
+```
+
+**3. Run migrations:**
 
 ```bash
 cd ConwaysGameOfLifeApi
 dotnet ef database update
 ```
 
-### 4. Run the Application
+**4. Run the application:**
 
 ```bash
 dotnet run
 ```
-
-The API will start at `https://localhost:5001` (or the port shown in the console).
-
-### 5. Test the API
-
-Use curl, Postman, or any HTTP client to test the endpoints. See [EXAMPLES.md](EXAMPLES.md) for sample requests.
 
 ## Running Tests
 
@@ -284,90 +298,3 @@ ConwaysGameOfLifeApi/
 ### Moving Patterns
 - **Glider** - Moves diagonally every 4 generations
 - **Lightweight Spaceship (LWSS)** - Moves horizontally
-
-## Testing
-
-### Test Coverage
-
-- **27 Unit Tests**
-  - Conway's rules (underpopulation, survival, overpopulation, reproduction)
-  - Known patterns (block, blinker, glider)
-  - Edge cases (empty boards, single cells)
-  - Cycle detection (static, oscillating, timeout)
-  - Array conversion and validation
-
-- **13 Integration Tests**
-  - Full HTTP request/response pipeline
-  - Database persistence
-  - Input validation
-  - Error responses
-  - End-to-end workflows
-
-### Example Test Run
-
-```bash
-$ dotnet test
-
-Passed!  - Failed:     0, Passed:    38, Skipped:     0, Total:    38
-```
-
-## Production Considerations
-
-For production deployment, consider:
-
-1. **Authentication/Authorization** - Add JWT or OAuth2 (currently not implemented per requirements)
-2. **Rate Limiting** - Prevent abuse of compute-heavy endpoints
-3. **Caching** - Redis cache for frequently accessed boards
-4. **Monitoring** - Application Insights or similar APM
-5. **Secrets Management** - Use Azure Key Vault or AWS Secrets Manager for connection strings
-6. **Horizontal Scaling** - Stateless design supports multiple instances behind load balancer
-7. **Database Optimization** - Add indexes, connection pooling tuning
-
-## Development
-
-### Adding New Features
-
-Example: Add endpoint to list all boards
-
-1. **Add DTO** in `Models/DTOs/BoardDTOs.cs`
-2. **Add method** to `IBoardRepository` and `BoardRepository`
-3. **Add method** to `IBoardService` and `BoardService`
-4. **Add endpoint** to `BoardsController`
-5. **Add tests** in appropriate test files
-
-### Database Migrations
-
-After modifying entities:
-
-```bash
-dotnet ef migrations add MigrationName
-dotnet ef database update
-```
-
-## Troubleshooting
-
-**Database connection fails:**
-- Verify PostgreSQL is running: `pg_isready`
-- Check connection string in `appsettings.json`
-- Ensure database exists
-
-**Tests fail:**
-- Run `dotnet restore` to restore packages
-- Ensure .NET 8 SDK is installed: `dotnet --version`
-
-**Port already in use:**
-- Change port in `Properties/launchSettings.json`
-- Or set environment variable: `export ASPNETCORE_URLS="http://localhost:5002"`
-
-## License
-
-This project is an interview exercise and is not licensed for commercial use.
-
-## Author
-
-Built as a production-ready code exercise demonstrating:
-- Clean architecture
-- RESTful API design
-- Test-driven development
-- .NET best practices
-- Documentation skills
