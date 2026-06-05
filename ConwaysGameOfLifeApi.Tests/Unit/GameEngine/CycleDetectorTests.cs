@@ -60,58 +60,6 @@ public class CycleDetectorTests
   }
 
   [Fact]
-  public void IsStatic_LessThanTwoStates_ReturnsFalse()
-  {
-    // Arrange
-    var detector = new CycleDetector();
-    var state = new bool[3, 3];
-
-    // Act
-    detector.AddStateAndCheckForCycle(state);
-    var isStatic = detector.IsStatic();
-
-    // Assert
-    Assert.False(isStatic);
-  }
-
-  [Fact]
-  public void IsStatic_SameLastTwoStates_ReturnsTrue()
-  {
-    // Arrange
-    var detector = new CycleDetector();
-    var state = new bool[3, 3];
-    state[1, 1] = true;
-
-    // Act
-    detector.AddStateAndCheckForCycle(state);
-    detector.AddStateAndCheckForCycle(state); // Add same state again
-    var isStatic = detector.IsStatic();
-
-    // Assert
-    Assert.True(isStatic);
-  }
-
-  [Fact]
-  public void IsStatic_DifferentLastTwoStates_ReturnsFalse()
-  {
-    // Arrange
-    var detector = new CycleDetector();
-    var state1 = new bool[3, 3];
-    state1[1, 1] = true;
-
-    var state2 = new bool[3, 3];
-    state2[1, 2] = true;
-
-    // Act
-    detector.AddStateAndCheckForCycle(state1);
-    detector.AddStateAndCheckForCycle(state2);
-    var isStatic = detector.IsStatic();
-
-    // Assert
-    Assert.False(isStatic);
-  }
-
-  [Fact]
   public void IsAllDead_EmptyBoard_ReturnsTrue()
   {
     // Arrange

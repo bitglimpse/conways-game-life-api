@@ -52,17 +52,6 @@ public class CycleDetector
   }
 
   /// <summary>
-  /// Checks if the current state is static (matches the previous state)
-  /// </summary>
-  public bool IsStatic()
-  {
-    if (_stateHashes.Count < 2)
-      return false;
-
-    return _stateHashes[^1] == _stateHashes[^2]; // Compare last two states
-  }
-
-  /// <summary>
   /// Checks if the board is completely dead (all cells are false)
   /// </summary>
   public bool IsAllDead(bool[,] state)
